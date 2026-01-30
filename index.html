@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Tools</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+}
+
+.hidden { display: none; }
+
+h1, h2 {
+  text-align: center;
+}
+
+.card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 12px 28px rgba(15,23,42,0.08);
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 16px;
+  margin-top: 14px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: #3b82f6;
+  color: white;
+}
+
+button.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+}
+
+.step { display: none; }
+.step.active { display: block; }
+
+.timer {
+  font-size: 64px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.positive { color: #16a34a; }
+.negative { color: #dc2626; }
+</style>
+</head>
+
+<body>
+
+<!-- MODE SELECT -->
+<div id="menu" class="card">
+  <h1>What do you want to do?</h1>
+  <button onclick="showLeave()">🕒 Leave Time Calculator</button>
+  <button class="secondary" onclick="showChore()">⚡ Chore Speedrun</button>
+</div>
+
+<!-- LEAVE TIME -->
+<div id="leaveApp" class="hidden">
+  <h2>When Do I Need to Start?</h2>
+  <div class="card">
+
+    <div class="step active" id="l1">
+      <label>Drive time (minutes)</label>
+      <input type="number" id="drive">
+      <button onclick="lNext(2)">Next</button>
+    </div>
+
+    <div class="step" id="l2">
+      <label>Arrival time</label>
+      <input type="time" id="arrival">
+      <button onclick="lNext(3)">Next</button>
+    </div>
+
+    <div class="step" id="l3">
+      <label>Shower?</label>
+      <button onclick="calc(false)">No</button>
+      <button class="secondary" onclick="calc(true)">Yes</button>
+    </div>
+
+    <div class="step" id="lResult">
+      <div id="leaveOutput"></div>
+      <button class="secondary" onclick="back()">Back</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- CHORE SPEEDRUN -->
+<div id="choreApp" class="hidden">
+  <div class="card" onclick="nextChore()">
+    <h2 id="taskTitle">START</h2>
+    <div class="timer" id="count"></div>
+    <div id="choreStats"></div>
+    <button class="secondary" onclick="event.stopPropagation(); back()">Back</button>
+  </div>
+</div>
+
+<script>
+/* NAV */
+function showLeave() {
+  menu.classList.add("hidden");
+  leaveApp.classList.remove("hidden");
+}
+function showChore() {
+  menu.classList.add("hidden");
+  choreApp.classList.remove("hidden");
+}
+function back() {
+  location.reload();
+}
+
+/* LEAVE CALC */
+function lNext(n) {
+  document.querySelectorAll("#leaveApp .step").forEach(s => s.classList.remove("active"));
+  document.getElementById("l"+n).classList.add("active");
+}
+function t2m(t){const[a,b]=t.split(":").map(Number);return a*60+b;}
+function m2t(m){
+  m=(m+1440)%1440;let h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM";
+  h=h%12||12;return `${h}:${mm.toString().padStart(2,"0")} ${ap}`;
+}
+function calc(shower){
+  const d=+drive.value,a=arrival.value;
+  const prep=shower?50:35;
+  const arr=t2m(a),leave=arr-d,start=leave-prep;
+  document.querySelectorAll("#leaveApp .step").forEach(s=>s.classList.remove("active"));
+  lResult.classList.add("active");
+  leaveOutput.innerHTML=
+    `Start: ${m2t(start)}<br>Leave: ${m2t(leave)}<br>Prep: ${prep}m`;
+}
+
+/* CHORE SPEEDRUN */
+const chores=["Cans","Trash","Clothes","Shoes","Dishes","Dog Toys"];
+let idx=-1,rem=0,timer=null;
+function nextChore(){
+  if(timer) clearInterval(timer);
+  idx++;
+  if(idx>=chores.length){
+    taskTitle.textContent="DONE";
+    count.textContent="";
+    choreStats.textContent="Run complete";
+    return;
+  }
+  taskTitle.textContent=chores[idx];
+  rem=30;
+  count.textContent=rem;
+  timer=setInterval(()=>{
+    rem--;count.textContent=rem;
+    if(rem<=0) clearInterval(timer);
+  },1000);
+}
+</script>
+
+</body>
+</html>

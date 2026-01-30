@@ -105,7 +105,7 @@ input {
 
     <div class="step" id="lResult">
       <div id="leaveOutput"></div>
-      <button class="secondary" onclick="back()">Back</button>
+      <button class="secondary" onclick="goHome()">Back</button>
     </div>
 
   </div>
@@ -117,36 +117,55 @@ input {
     <h2 id="taskTitle">START</h2>
     <div class="timer" id="count"></div>
     <div id="choreStats"></div>
-    <button class="secondary" onclick="event.stopPropagation(); back()">Back</button>
+    <button class="secondary" onclick="event.stopPropagation(); goHome()">Back</button>
   </div>
 </div>
 
 <script>
-/* NAV */
+/* ---------- HELPERS ---------- */
+function formatTime(sec) {
+  sec = Math.abs(sec);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m === 0) return `${s}s`;
+  if (s === 0) return `${m}m`;
+  return `${m}m ${s}s`;
+}
+
+/* ---------- NAV ---------- */
+function goHome() {
+  clearInterval(timer);
+  menu.classList.remove("hidden");
+  leaveApp.classList.add("hidden");
+  choreApp.classList.add("hidden");
+  resetChores();
+}
+
 function showLeave() {
   menu.classList.add("hidden");
   leaveApp.classList.remove("hidden");
 }
+
 function showChore() {
   menu.classList.add("hidden");
   choreApp.classList.remove("hidden");
 }
-function back() {
-  location.reload();
-}
 
-/* LEAVE CALC */
+/* ---------- LEAVE CALC ---------- */
 function lNext(n) {
   document.querySelectorAll("#leaveApp .step").forEach(s => s.classList.remove("active"));
   document.getElementById("l"+n).classList.add("active");
 }
+
 function t2m(t){const[a,b]=t.split(":").map(Number);return a*60+b;}
+
 function m2t(m){
   m=(m+1440)%1440;
   let h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM";
   h=h%12||12;
   return `${h}:${mm.toString().padStart(2,"0")} ${ap}`;
 }
+
 function calc(shower){
   const d=+drive.value,a=arrival.value;
   const prep=shower?50:35;
@@ -160,7 +179,7 @@ function calc(shower){
      Drive time: ${d} min`;
 }
 
-/* CHORE SPEEDRUN (WITH STATS) */
+/* ---------- CHORE SPEEDRUN ---------- */
 const chores = [
   { name: "Cans", expected: 30 },
   { name: "Trash", expected: 40 },
@@ -174,9 +193,17 @@ let idx = -1;
 let timer = null;
 let remaining = 0;
 let taskStart = 0;
-
 let totalExpected = 0;
 let totalActual = 0;
+
+function resetChores() {
+  idx = -1;
+  totalExpected = 0;
+  totalActual = 0;
+  taskTitle.textContent = "START";
+  count.textContent = "";
+  choreStats.innerHTML = "";
+}
 
 function nextChore(){
   if (timer) {
@@ -189,10 +216,10 @@ function nextChore(){
     totalActual += actual;
 
     choreStats.innerHTML =
-      `Expected: ${expected}s<br>
-       Actual: ${actual}s<br>
+      `Expected: ${formatTime(expected)}<br>
+       Actual: ${formatTime(actual)}<br>
        <span class="${delta >= 0 ? "positive" : "negative"}">
-       ${delta >= 0 ? "Saved" : "Lost"}: ${Math.abs(delta)}s
+       ${delta >= 0 ? "Saved" : "Lost"}: ${formatTime(delta)}
        </span>`;
   }
 
@@ -203,10 +230,10 @@ function nextChore(){
     taskTitle.textContent = "RUN COMPLETE";
     count.textContent = "";
     choreStats.innerHTML =
-      `Expected total: ${totalExpected}s<br>
-       Actual total: ${totalActual}s<br>
+      `Expected total: ${formatTime(totalExpected)}<br>
+       Actual total: ${formatTime(totalActual)}<br>
        <span class="${net >= 0 ? "positive" : "negative"}">
-       Net ${net >= 0 ? "saved" : "lost"}: ${Math.abs(net)}s
+       Net ${net >= 0 ? "saved" : "lost"}: ${formatTime(net)}
        </span>`;
     return;
   }
@@ -214,13 +241,13 @@ function nextChore(){
   const task = chores[idx];
   taskTitle.textContent = task.name;
   remaining = task.expected;
-  count.textContent = remaining;
+  count.textContent = formatTime(remaining);
   choreStats.innerHTML = "";
   taskStart = Date.now();
 
   timer = setInterval(() => {
     remaining--;
-    count.textContent = remaining;
+    count.textContent = formatTime(remaining);
     if (remaining <= 0) clearInterval(timer);
   }, 1000);
 }

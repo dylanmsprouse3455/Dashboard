@@ -1,171 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Tools</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Command Center</title>
 
 <style>
-*, *::before, *::after { box-sizing: border-box; }
+*,*::before,*::after{box-sizing:border-box}
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: #f8fafc;
-  color: #0f172a;
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:#f8fafc;
+  color:#0f172a;
+  max-width:430px;
+  margin:auto;
+  padding:18px;
 }
 
-.hidden { display: none; }
+h1{text-align:center;font-size:20px}
 
-h1, h2 { text-align: center; }
-
-.card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: 0 12px 28px rgba(15,23,42,0.08);
-  margin-bottom: 20px;
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 12px 28px rgba(15,23,42,0.08);
+  margin-bottom:14px;
 }
 
-button {
-  width: 100%;
-  padding: 16px;
-  margin-top: 14px;
-  font-size: 16px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  background: #3b82f6;
-  color: white;
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:650;
+  cursor:pointer;
+  background:#3b82f6;
+  color:white;
+  margin-top:10px;
 }
 
-button.secondary {
-  background: #e2e8f0;
-  color: #0f172a;
+button.secondary{
+  background:#e2e8f0;
+  color:#0f172a;
 }
 
-input {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: 1px solid #cbd5f5;
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #cbd5e1;
+  margin-top:8px;
 }
 
-.step { display: none; }
-.step.active { display: block; }
+.hidden{display:none}
 
-.timer {
-  font-size: 64px;
-  margin-top: 12px;
-  text-align: center;
+.big{
+  font-size:22px;
+  font-weight:800;
+  text-align:center;
+  margin-top:10px;
 }
 
-.positive { color: #16a34a; }
-.negative { color: #dc2626; }
+.tiny{
+  font-size:12px;
+  color:#64748b;
+  text-align:center;
+}
+
+.progress{
+  height:10px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:#10b981;
+}
 </style>
 </head>
 
 <body>
 
-<!-- MENU -->
-<div id="menu" class="card">
-  <h1>What do you want to do?</h1>
-  <button onclick="showLeave()">🕒 Leave Time Calculator</button>
-  <button class="secondary" onclick="showChore()">⚡ Chore Speedrun</button>
+<h1>Daily Command Center</h1>
+
+<!-- HOME -->
+<div id="home" class="card">
+  <button onclick="openApp('leave')">🕒 Leave Time</button>
+  <button class="secondary" onclick="openApp('grocery')">🛒 Grocery Wizard</button>
+  <button class="secondary" onclick="openApp('money')">💵 Money Snapshot</button>
 </div>
 
-<!-- LEAVE TIME -->
-<div id="leaveApp" class="hidden">
-  <h2>When Do I Need to Start?</h2>
-  <div class="card">
+<!-- LEAVE -->
+<div id="leave" class="hidden">
+<div class="card">
+<label>Arrival time</label>
+<input type="time" id="arrival">
 
-    <div class="step active" id="l1">
-      <label>Drive time (minutes)</label>
-      <input type="number" id="drive">
-      <button onclick="lNext(2)">Next</button>
-    </div>
+<label>Drive time (minutes)</label>
+<input type="number" id="drive">
 
-    <div class="step" id="l2">
-      <label>Arrival time</label>
-      <input type="time" id="arrival">
-      <button onclick="lNext(3)">Next</button>
-    </div>
+<button onclick="calcLeave(false)">No Shower</button>
+<button onclick="calcLeave(true)">Shower</button>
 
-    <div class="step" id="l3">
-      <label>Shower?</label>
-      <button onclick="calc(false)">No</button>
-      <button class="secondary" onclick="calc(true)">Yes</button>
-    </div>
+<div id="leaveOut" class="big"></div>
+<div id="leaveOut2" class="tiny"></div>
 
-    <div class="step" id="lResult">
-      <div id="leaveOutput"></div>
-      <button class="secondary" onclick="goHome()">Back</button>
-    </div>
-
-  </div>
+<button class="secondary" onclick="goHome()">Back</button>
+</div>
 </div>
 
-<!-- CHORE SPEEDRUN -->
-<div id="choreApp" class="hidden">
-  <div class="card" onclick="nextChore()">
-    <h2 id="taskTitle">START</h2>
-    <div class="timer" id="count"></div>
-    <div id="choreStats"></div>
-    <button class="secondary" onclick="event.stopPropagation(); goHome()">Back</button>
-  </div>
+<!-- MONEY -->
+<div id="money" class="hidden">
+<div class="card">
+
+<label>Current balance</label>
+<input type="number" id="bal">
+
+<label>Bills before payday</label>
+<input type="number" id="bills">
+
+<label>Safety buffer</label>
+<input type="number" id="buffer">
+
+<button onclick="calcMoney()">Calculate</button>
+
+<div id="moneyOut" class="big"></div>
+<div id="moneyOut2" class="tiny"></div>
+
+<button class="secondary" onclick="goHome()">Back</button>
+</div>
 </div>
 
+<!-- GROCERY -->
+<div id="grocery" class="hidden">
+<div class="card">
 
+<div id="gwStep1">
+<p>How many days?</p>
+<button onclick="gwDays(3)">3</button>
+<button onclick="gwDays(5)">5</button>
+<button onclick="gwDays(7)">7</button>
+</div>
 
+<div id="gwStep2" class="hidden">
+<p>Budget?</p>
+<button onclick="gwBudget('tight')">Tight</button>
+<button onclick="gwBudget('normal')">Normal</button>
+<button onclick="gwBudget('flex')">Flexible</button>
+</div>
 
+<div id="gwDone" class="hidden">
+<h3>Your List</h3>
+<ul id="gwList"></ul>
+<button onclick="gwRestart()">Restart</button>
+</div>
 
+<button class="secondary" onclick="goHome()">Back</button>
 
-
+</div>
+</div>
 
 <script>
-/* ---------- HELPERS ---------- */
-function formatTime(sec) {
-  sec = Math.abs(sec);
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  if (m === 0) return `${s}s`;
-  if (s === 0) return `${m}m`;
-  return `${m}m ${s}s`;
+function openApp(id){
+  home.classList.add("hidden");
+  leave.classList.add("hidden");
+  grocery.classList.add("hidden");
+  money.classList.add("hidden");
+  document.getElementById(id).classList.remove("hidden");
 }
 
-/* ---------- NAV ---------- */
-function goHome() {
-  clearInterval(timer);
-  menu.classList.remove("hidden");
-  leaveApp.classList.add("hidden");
-  choreApp.classList.add("hidden");
-  resetChores();
+function goHome(){
+  leave.classList.add("hidden");
+  grocery.classList.add("hidden");
+  money.classList.add("hidden");
+  home.classList.remove("hidden");
 }
 
-function showLeave() {
-  menu.classList.add("hidden");
-  leaveApp.classList.remove("hidden");
-}
-
-function showChore() {
-  menu.classList.add("hidden");
-  choreApp.classList.remove("hidden");
-}
-
-/* ---------- LEAVE CALC ---------- */
-function lNext(n) {
-  document.querySelectorAll("#leaveApp .step").forEach(s => s.classList.remove("active"));
-  document.getElementById("l"+n).classList.add("active");
-}
-
-function t2m(t){const[a,b]=t.split(":").map(Number);return a*60+b;}
-
+/* LEAVE */
+function t2m(t){let[a,b]=t.split(":");return a*60+ +b;}
 function m2t(m){
   m=(m+1440)%1440;
   let h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM";
@@ -173,290 +191,64 @@ function m2t(m){
   return `${h}:${mm.toString().padStart(2,"0")} ${ap}`;
 }
 
-function calc(shower){
-  const d=+drive.value,a=arrival.value;
-  const prep=shower?50:35;
-  const arr=t2m(a),leave=arr-d,start=leave-prep;
-  document.querySelectorAll("#leaveApp .step").forEach(s=>s.classList.remove("active"));
-  lResult.classList.add("active");
-  leaveOutput.innerHTML=
-    `Start getting ready by:<br><strong>${m2t(start)}</strong><br><br>
-     Leave the house by:<br><strong>${m2t(leave)}</strong><br><br>
-     Prep time: ${prep} min<br>
-     Drive time: ${d} min`;
+function calcLeave(shower){
+  let a=arrival.value;
+  let d=+drive.value;
+  if(!a||!d)return;
+
+  let prep=shower?50:35;
+  let arr=t2m(a);
+  let leave=arr-d;
+  let start=leave-prep;
+
+  leaveOut.innerHTML=`Start: ${m2t(start)}<br>Leave: ${m2t(leave)}`;
+  leaveOut2.textContent=`Prep ${prep}m + Drive ${d}m`;
 }
 
-/* ---------- CHORE SPEEDRUN ---------- */
-const chores = [
-  { name: "Cans", expected: 30 },
-  { name: "Trash", expected: 40 },
-  { name: "Clothes", expected: 35 },
-  { name: "Shoes", expected: 20 },
-  { name: "Dishes", expected: 45 },
-  { name: "Dog Toys", expected: 25 }
-];
-
-let idx = -1;
-let timer = null;
-let remaining = 0;
-let taskStart = 0;
-let totalExpected = 0;
-let totalActual = 0;
-
-function resetChores() {
-  idx = -1;
-  totalExpected = 0;
-  totalActual = 0;
-  taskTitle.textContent = "START";
-  count.textContent = "";
-  choreStats.innerHTML = "";
+/* MONEY */
+function calcMoney(){
+  let b=+bal.value||0;
+  let due=+bills.value||0;
+  let buf=+buffer.value||0;
+  let safe=b-due-buf;
+  moneyOut.textContent=`$${safe.toFixed(2)}`;
+  moneyOut2.textContent="Safe to spend";
 }
 
-function nextChore(){
-  if (timer) {
-    clearInterval(timer);
-    const actual = Math.round((Date.now() - taskStart) / 1000);
-    const expected = chores[idx].expected;
-    const delta = expected - actual;
-
-    totalExpected += expected;
-    totalActual += actual;
-
-    choreStats.innerHTML =
-      `Expected: ${formatTime(expected)}<br>
-       Actual: ${formatTime(actual)}<br>
-       <span class="${delta >= 0 ? "positive" : "negative"}">
-       ${delta >= 0 ? "Saved" : "Lost"}: ${formatTime(delta)}
-       </span>`;
-  }
-
-  idx++;
-
-  if (idx >= chores.length) {
-    const net = totalExpected - totalActual;
-    taskTitle.textContent = "RUN COMPLETE";
-    count.textContent = "";
-    choreStats.innerHTML =
-      `Expected total: ${formatTime(totalExpected)}<br>
-       Actual total: ${formatTime(totalActual)}<br>
-       <span class="${net >= 0 ? "positive" : "negative"}">
-       Net ${net >= 0 ? "saved" : "lost"}: ${formatTime(net)}
-       </span>`;
-    return;
-  }
-
-  const task = chores[idx];
-  taskTitle.textContent = task.name;
-  remaining = task.expected;
-  count.textContent = formatTime(remaining);
-  choreStats.innerHTML = "";
-  taskStart = Date.now();
-
-  timer = setInterval(() => {
-    remaining--;
-    count.textContent = formatTime(remaining);
-    if (remaining <= 0) clearInterval(timer);
-  }, 1000);
-}
-</script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaving Town Wizard</title>
-
-<style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#0f172a;
-  color:white;
-  max-width:520px;
-  margin:auto;
-  padding:20px;
-  text-align:center;
-}
-
-.card{
-  background:#111827;
-  padding:20px;
-  border-radius:14px;
-}
-
-button{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  font-weight:700;
-  margin-top:10px;
-  cursor:pointer;
-}
-
-.yes{background:#4ade80;}
-.no{background:#fb7185;}
-.start{background:#38bdf8;}
-.restart{background:#f59e0b;}
-
-.progress{
-  height:12px;
-  background:#1f2933;
-  border-radius:999px;
-  margin-top:15px;
-  overflow:hidden;
-}
-
-.bar{
-  height:100%;
-  width:0%;
-  background:#4ade80;
-}
-
-.hidden{display:none;}
-</style>
-</head>
-
-<body>
-
-<h2>Leaving Town Checklist</h2>
-
-<div class="card">
-
-<div id="startScreen">
-  <button class="start" onclick="start()">Start</button>
-</div>
-
-<div id="dayScreen" class="hidden">
-  <p>How many days are you gone?</p>
-  <input id="days" type="number" value="1" min="0" style="width:100%;padding:10px;border-radius:10px;">
-  <button onclick="setDays()">Continue</button>
-</div>
-
-<div id="quiz" class="hidden">
-  <h3 id="question"></h3>
-
-  <button class="yes" onclick="answer(true)">Yes</button>
-  <button class="no" onclick="answer(false)">No</button>
-
-  <div class="progress">
-    <div class="bar" id="bar"></div>
-  </div>
-
-  <p id="counter"></p>
-</div>
-
-<div id="done" class="hidden">
-  <h3>Done ✅</h3>
-  <p id="summary"></p>
-  <button class="restart" onclick="restart()">Restart</button>
-</div>
-
-</div>
-
-<script>
-const STORAGE="wizardTrip";
-
-const allItems=[
-  {q:"Did you pack your toothbrush?",trip:"long"},
-  {q:"Did you pack toothpaste?",trip:"long"},
-  {q:"Did you pack deodorant?",trip:"both"},
-  {q:"Did you pack your meds?",trip:"both"},
-  {q:"Did you pack your phone charger?",trip:"both"},
-  {q:"Did you pack your laptop?",trip:"short"},
-  {q:"Did you feed the dog?",trip:"both"},
-  {q:"Is the dog’s water full?",trip:"both"},
-  {q:"Did you feed the cats?",trip:"both"},
-  {q:"Is the cats’ water full?",trip:"both"},
-  {q:"Did you scoop the litter box?",trip:"long"},
-  {q:"Did you arrange pet care if needed?",trip:"long"},
-  {q:"Did you take out the trash?",trip:"long"},
-  {q:"Did you do the dishes?",trip:"long"},
-  {q:"Are the doors locked?",trip:"both"},
-  {q:"Did you pack your wallet?",trip:"both"},
-  {q:"Do you have your keys?",trip:"both"},
-  {q:"Did you pack clothes?",trip:"both"}
-];
-
-let state=JSON.parse(localStorage.getItem(STORAGE))||{
-  days:1,
-  trip:"short",
-  index:0,
-  answers:[]
+/* GROCERY */
+const pool={
+tight:["eggs","rice","beans","tuna"],
+normal:["chicken","pasta","bread","fruit"],
+flex:["steak","salmon","snacks","drinks"]
 };
 
-let items=[];
+let gDays=0;
 
-function save(){
-  localStorage.setItem(STORAGE,JSON.stringify(state));
+function gwDays(d){
+  gDays=d;
+  gwStep1.classList.add("hidden");
+  gwStep2.classList.remove("hidden");
 }
 
-function start(){
-  startScreen.classList.add("hidden");
-  dayScreen.classList.remove("hidden");
+function gwBudget(b){
+  gwStep2.classList.add("hidden");
+  gwDone.classList.remove("hidden");
+
+  let list=pool[b].slice();
+  if(gDays>=5) list.push("vegetables");
+  if(gDays>=7) list.push("milk");
+
+  gwList.innerHTML="";
+  list.forEach(i=>{
+    let li=document.createElement("li");
+    li.textContent=i;
+    gwList.appendChild(li);
+  });
 }
 
-function setDays(){
-  state.days=+days.value;
-  state.trip=state.days>=2?"long":"short";
-
-  items=allItems.filter(i=>i.trip==="both"||i.trip===state.trip);
-
-  dayScreen.classList.add("hidden");
-  quiz.classList.remove("hidden");
-
-  state.index=0;
-  state.answers=[];
-  save();
-
-  showQ();
-}
-
-function showQ(){
-  if(state.index>=items.length){
-    finish();
-    return;
-  }
-
-  question.innerText=items[state.index].q;
-  counter.innerText=`${state.index+1} / ${items.length}`;
-
-  let pct=Math.round((state.index/items.length)*100);
-  bar.style.width=pct+"%";
-}
-
-function answer(val){
-  state.answers.push(val);
-  state.index++;
-  save();
-  showQ();
-}
-
-function finish(){
-  quiz.classList.add("hidden");
-  done.classList.remove("hidden");
-
-  let yesCount=state.answers.filter(x=>x).length;
-
-  summary.innerText=`You answered YES to ${yesCount} of ${items.length} items.`;
-  bar.style.width="100%";
-}
-
-function restart(){
-  localStorage.removeItem(STORAGE);
-  location.reload();
+function gwRestart(){
+  gwDone.classList.add("hidden");
+  gwStep1.classList.remove("hidden");
 }
 </script>
 

@@ -1,256 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Daily Command Center</title>
-
-<style>
-*,*::before,*::after{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-  background:#f8fafc;
-  color:#0f172a;
-  max-width:430px;
-  margin:auto;
-  padding:18px;
-}
-
-h1{text-align:center;font-size:20px}
-
-.card{
-  background:#fff;
-  border-radius:18px;
-  padding:16px;
-  box-shadow:0 12px 28px rgba(15,23,42,0.08);
-  margin-bottom:14px;
-}
-
-button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:650;
-  cursor:pointer;
-  background:#3b82f6;
-  color:white;
-  margin-top:10px;
-}
-
-button.secondary{
-  background:#e2e8f0;
-  color:#0f172a;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #cbd5e1;
-  margin-top:8px;
-}
-
-.hidden{display:none}
-
-.big{
-  font-size:22px;
-  font-weight:800;
-  text-align:center;
-  margin-top:10px;
-}
-
-.tiny{
-  font-size:12px;
-  color:#64748b;
-  text-align:center;
-}
-
-.progress{
-  height:10px;
-  background:#e2e8f0;
-  border-radius:999px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-.bar{
-  height:100%;
-  width:0%;
-  background:#10b981;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
+  <title>Daily Command Center</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="app-shell">
+    <header class="app-header">
+      <p class="eyebrow">Personal Utility App</p>
+      <h1>Daily Command Center</h1>
+      <p class="subtitle">Your day, your numbers, your plan.</p>
+    </header>
 
-<h1>Daily Command Center</h1>
+    <main>
+      <section id="home" class="view active" aria-label="Home">
+        <div class="status-card" id="statusCard">
+          <p class="status-label">Today</p>
+          <h2 id="statusDate">--</h2>
+          <p id="statusTime">--:--</p>
+          <p id="statusFocus">No focus set yet.</p>
+        </div>
 
-<!-- HOME -->
-<div id="home" class="card">
-  <button onclick="openApp('leave')">🕒 Leave Time</button>
-  <button class="secondary" onclick="openApp('grocery')">🛒 Grocery Wizard</button>
-  <button class="secondary" onclick="openApp('money')">💵 Money Snapshot</button>
-</div>
+        <div class="home-grid">
+          <button class="home-card" data-target="today">
+            <span>🗓️</span>
+            <strong>Today Panel</strong>
+            <small>Date, time, and focus</small>
+          </button>
+          <button class="home-card" data-target="leave">
+            <span>🚗</span>
+            <strong>Leave-Time</strong>
+            <small>Plan your ready + leave times</small>
+          </button>
+          <button class="home-card" data-target="money">
+            <span>💸</span>
+            <strong>Money Snapshot</strong>
+            <small>See what is safe to spend</small>
+          </button>
+          <button class="home-card" data-target="grocery">
+            <span>🛒</span>
+            <strong>Grocery Wizard</strong>
+            <small>Quick list by days + budget</small>
+          </button>
+          <button class="home-card" data-target="notes">
+            <span>📝</span>
+            <strong>Quick Notes</strong>
+            <small>Capture thoughts fast</small>
+          </button>
+        </div>
+      </section>
 
-<!-- LEAVE -->
-<div id="leave" class="hidden">
-<div class="card">
-<label>Arrival time</label>
-<input type="time" id="arrival">
+      <section id="today" class="view" aria-label="Today Panel">
+        <div class="view-head">
+          <h2>Today Panel</h2>
+          <button class="ghost-btn back-home">Back Home</button>
+        </div>
+        <div class="card">
+          <p class="hint">Current Date</p>
+          <p class="big-line" id="todayDate">--</p>
+          <p class="hint">Current Time</p>
+          <p class="big-line" id="todayTime">--:--</p>
+        </div>
+        <div class="card">
+          <label for="dailyFocus">Daily Focus</label>
+          <input id="dailyFocus" type="text" maxlength="120" placeholder="Example: Finish project review by 2 PM" />
+          <button id="saveFocusBtn" class="primary-btn">Save Focus</button>
+          <p class="saved-text" id="focusSavedText">Nothing saved yet.</p>
+        </div>
+      </section>
 
-<label>Drive time (minutes)</label>
-<input type="number" id="drive">
+      <section id="leave" class="view" aria-label="Leave-Time Calculator">
+        <div class="view-head">
+          <h2>Leave-Time Calculator</h2>
+          <button class="ghost-btn back-home">Back Home</button>
+        </div>
+        <div class="card form-grid">
+          <label for="arrivalTime">Arrival time</label>
+          <input id="arrivalTime" type="time" />
 
-<button onclick="calcLeave(false)">No Shower</button>
-<button onclick="calcLeave(true)">Shower</button>
+          <label for="driveTime">Drive time (minutes)</label>
+          <input id="driveTime" type="number" min="0" max="300" />
 
-<div id="leaveOut" class="big"></div>
-<div id="leaveOut2" class="tiny"></div>
+          <label for="prepTime">Prep time (minutes)</label>
+          <input id="prepTime" type="number" min="0" max="240" />
 
-<button class="secondary" onclick="goHome()">Back</button>
-</div>
-</div>
+          <label class="toggle-row" for="showerNeeded">
+            <input id="showerNeeded" type="checkbox" />
+            Add shower time (+20 min)
+          </label>
 
-<!-- MONEY -->
-<div id="money" class="hidden">
-<div class="card">
+          <button id="calcLeaveBtn" class="primary-btn">Calculate Times</button>
+        </div>
+        <div class="card result-card">
+          <p><strong>Start getting ready:</strong> <span id="readyTimeOutput">--:--</span></p>
+          <p><strong>Leave house:</strong> <span id="leaveTimeOutput">--:--</span></p>
+        </div>
+      </section>
 
-<label>Current balance</label>
-<input type="number" id="bal">
+      <section id="money" class="view" aria-label="Money Snapshot">
+        <div class="view-head">
+          <h2>Money Snapshot</h2>
+          <button class="ghost-btn back-home">Back Home</button>
+        </div>
+        <div class="card form-grid">
+          <label for="balanceInput">Current balance ($)</label>
+          <input id="balanceInput" type="number" min="0" step="0.01" />
 
-<label>Bills before payday</label>
-<input type="number" id="bills">
+          <label for="billsInput">Bills before payday ($)</label>
+          <input id="billsInput" type="number" min="0" step="0.01" />
 
-<label>Safety buffer</label>
-<input type="number" id="buffer">
+          <label for="bufferInput">Safety buffer ($)</label>
+          <input id="bufferInput" type="number" min="0" step="0.01" />
 
-<button onclick="calcMoney()">Calculate</button>
+          <label for="gasFoodInput">Gas/food estimate ($)</label>
+          <input id="gasFoodInput" type="number" min="0" step="0.01" />
 
-<div id="moneyOut" class="big"></div>
-<div id="moneyOut2" class="tiny"></div>
+          <button id="calcMoneyBtn" class="primary-btn">Calculate Snapshot</button>
+        </div>
+        <div class="money-output">
+          <div class="card money-safe">
+            <p>Safe to Spend</p>
+            <h3 id="safeSpendOutput">$0.00</h3>
+          </div>
+          <div class="card money-protect">
+            <p>Do Not Touch</p>
+            <h3 id="dontTouchOutput">$0.00</h3>
+          </div>
+        </div>
+      </section>
 
-<button class="secondary" onclick="goHome()">Back</button>
-</div>
-</div>
+      <section id="grocery" class="view" aria-label="Grocery Wizard">
+        <div class="view-head">
+          <h2>Grocery Wizard</h2>
+          <button class="ghost-btn back-home">Back Home</button>
+        </div>
+        <div class="card form-grid">
+          <label for="daysSelect">Days</label>
+          <select id="daysSelect">
+            <option value="3">3 days</option>
+            <option value="5">5 days</option>
+            <option value="7">7 days</option>
+          </select>
 
-<!-- GROCERY -->
-<div id="grocery" class="hidden">
-<div class="card">
+          <label for="budgetSelect">Budget</label>
+          <select id="budgetSelect">
+            <option value="tight">Tight</option>
+            <option value="normal" selected>Normal</option>
+            <option value="flexible">Flexible</option>
+          </select>
 
-<div id="gwStep1">
-<p>How many days?</p>
-<button onclick="gwDays(3)">3</button>
-<button onclick="gwDays(5)">5</button>
-<button onclick="gwDays(7)">7</button>
-</div>
+          <button id="buildListBtn" class="primary-btn">Build Grocery List</button>
+          <button id="copyListBtn" class="secondary-btn">Copy List</button>
+          <p class="saved-text" id="copyFeedback"></p>
+        </div>
+        <div class="card">
+          <h3>Your Suggested List</h3>
+          <div id="groceryOutput" class="grocery-output"></div>
+        </div>
+      </section>
 
-<div id="gwStep2" class="hidden">
-<p>Budget?</p>
-<button onclick="gwBudget('tight')">Tight</button>
-<button onclick="gwBudget('normal')">Normal</button>
-<button onclick="gwBudget('flex')">Flexible</button>
-</div>
+      <section id="notes" class="view" aria-label="Quick Notes">
+        <div class="view-head">
+          <h2>Quick Notes</h2>
+          <button class="ghost-btn back-home">Back Home</button>
+        </div>
+        <div class="card">
+          <label for="noteInput">Add a short note</label>
+          <textarea id="noteInput" rows="3" maxlength="220" placeholder="Example: Call insurance at lunch"></textarea>
+          <div class="row-buttons">
+            <button id="addNoteBtn" class="primary-btn">Add Note</button>
+            <button id="clearNotesBtn" class="secondary-btn">Clear Notes</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Recent Notes</h3>
+          <ul id="notesList" class="notes-list"></ul>
+        </div>
+      </section>
+    </main>
 
-<div id="gwDone" class="hidden">
-<h3>Your List</h3>
-<ul id="gwList"></ul>
-<button onclick="gwRestart()">Restart</button>
-</div>
+    <nav class="bottom-nav" aria-label="Main Navigation">
+      <button data-view="home" class="nav-btn active">Home</button>
+      <button data-view="today" class="nav-btn">Today</button>
+      <button data-view="leave" class="nav-btn">Leave</button>
+      <button data-view="money" class="nav-btn">Money</button>
+      <button data-view="grocery" class="nav-btn">Grocery</button>
+      <button data-view="notes" class="nav-btn">Notes</button>
+    </nav>
+  </div>
 
-<button class="secondary" onclick="goHome()">Back</button>
-
-</div>
-</div>
-
-<script>
-function openApp(id){
-  home.classList.add("hidden");
-  leave.classList.add("hidden");
-  grocery.classList.add("hidden");
-  money.classList.add("hidden");
-  document.getElementById(id).classList.remove("hidden");
-}
-
-function goHome(){
-  leave.classList.add("hidden");
-  grocery.classList.add("hidden");
-  money.classList.add("hidden");
-  home.classList.remove("hidden");
-}
-
-/* LEAVE */
-function t2m(t){let[a,b]=t.split(":");return a*60+ +b;}
-function m2t(m){
-  m=(m+1440)%1440;
-  let h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM";
-  h=h%12||12;
-  return `${h}:${mm.toString().padStart(2,"0")} ${ap}`;
-}
-
-function calcLeave(shower){
-  let a=arrival.value;
-  let d=+drive.value;
-  if(!a||!d)return;
-
-  let prep=shower?50:35;
-  let arr=t2m(a);
-  let leave=arr-d;
-  let start=leave-prep;
-
-  leaveOut.innerHTML=`Start: ${m2t(start)}<br>Leave: ${m2t(leave)}`;
-  leaveOut2.textContent=`Prep ${prep}m + Drive ${d}m`;
-}
-
-/* MONEY */
-function calcMoney(){
-  let b=+bal.value||0;
-  let due=+bills.value||0;
-  let buf=+buffer.value||0;
-  let safe=b-due-buf;
-  moneyOut.textContent=`$${safe.toFixed(2)}`;
-  moneyOut2.textContent="Safe to spend";
-}
-
-/* GROCERY */
-const pool={
-tight:["eggs","rice","beans","tuna"],
-normal:["chicken","pasta","bread","fruit"],
-flex:["steak","salmon","snacks","drinks"]
-};
-
-let gDays=0;
-
-function gwDays(d){
-  gDays=d;
-  gwStep1.classList.add("hidden");
-  gwStep2.classList.remove("hidden");
-}
-
-function gwBudget(b){
-  gwStep2.classList.add("hidden");
-  gwDone.classList.remove("hidden");
-
-  let list=pool[b].slice();
-  if(gDays>=5) list.push("vegetables");
-  if(gDays>=7) list.push("milk");
-
-  gwList.innerHTML="";
-  list.forEach(i=>{
-    let li=document.createElement("li");
-    li.textContent=i;
-    gwList.appendChild(li);
-  });
-}
-
-function gwRestart(){
-  gwDone.classList.add("hidden");
-  gwStep1.classList.remove("hidden");
-}
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>

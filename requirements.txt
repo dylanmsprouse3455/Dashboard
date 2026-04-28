@@ -1,0 +1,6 @@
+rich
+requests
+beautifulsoup4
+dnspython
+phonenumbers
+tldextract
